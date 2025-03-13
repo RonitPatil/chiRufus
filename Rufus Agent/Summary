@@ -1,0 +1,42 @@
+I have been recently exploring Model Context Protocol. When I first read the assignment
+I believed using a MCP server would've been the best way to go about it. I downloaded the fetch,
+playwright and puppeteer server. These servers gave basic tools such as fetching, clicking and 
+navigating. There were more advanced tools such as browser base, firecrawl, exa, oxylabs etc; which
+had more flexibility while navigating through websites but they were all paid versions. 
+
+I started working with fetch and playwright MCP servers. Playwright offered a variety of tools but 
+it did not work properly. Puppeteer would not compile and the fetch MCP server had only tool "fetch"
+which gave information about a url. I spent a lot of time initially trying out these MCP servers and 
+connecting them to my agent. My initial thought was to extract links based on the users instuctions.
+This did not work as the llm started hallucinating the links. 
+
+The MCP servers weren't looking promising to extract links so I switched over to beautiful soup. I 
+scraped all the clickable links and gave it some context. These links with context were then passed 
+to the llm to filter out the relevant links. The llm then gave me the final list of links. Once the 
+relevant links were given(based on the users preference) I extract the html content from all of them,
+passed it to the LLM to generate a structured JSON object. 
+
+I used OpenAI's API key to generate the structured JSON object. Gemini would work as well since it has a 
+large context window. The JSON strcture was standardised through the ScrapedDocument class which forced it 
+to return a JSON object. This solved the issue of the LLM hallucinating and providing incorrect or added
+information for the JSON object. All calls to the LLM were made asynchrously using asyncio to prevent high 
+latency during multiple link scraping.
+
+The code implements robust error handling with custom exceptions along with logging to help debug and monitor
+the agent.  The code also includes a config system to manipulate a few settings of the agent. The agent follows
+a three tier architecture:
+
+0. Preprocessing tier: This tier is responsible for extracting all the clickable links via bs4
+1. Scrape tier: This tier is responsible for scraping the website and adding context to the links.
+2. Filter tier: This tier is responsible for filtering the links based on the user instructions.
+3. Generate tier: This tier is responsible for generating the structured JSON object.
+
+
+Once this was done I compiled it into a package and imported Rufus as a package and initialised RufusClient
+with the api key. I then used the scrape function to scrape the website along with the user instructions.
+The document generated was in a JSON object ready to be ingested into the RAG pipeline. 
+
+The agent can handle links, dynamic loaded content and nested pages upto a depth of 2. I tried to add a variable
+to increase the depth but it was not working. I was trying to use the depth to click on links of extracted pages 
+but the code was failing in the loop. Due to the time constraint I was not able to fix it. But this is something 
+I definetly would love to implement soon. 
