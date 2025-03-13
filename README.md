@@ -24,6 +24,7 @@ Rufus follows a multi-tier architecture to scrape and process web content:
 ## Installation
 
 ```bash
+cd Rufus Agent
 pip install -e .
 ```
 
